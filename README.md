@@ -155,10 +155,12 @@ If you want **cleaner, more scalable, and easier-to-debug code**, **the Result P
 
 ---
 
-With 💜 [@caiolandgraf](https://eicode.com.br)
-
 ## 👥 **Contributors**
 
 Special thanks to all the brilliant minds who have contributed to this project. Your expertise and dedication make this project better every day! 🌟
 
 - [@cristoferms](https://github.com/cristoferms)
+
+## 🌟 **Created by**
+
+Developed with dedication and expertise by [@caiolandgraf](https://github.com/caiolandgraf), transforming complex error handling into elegant, maintainable code.
