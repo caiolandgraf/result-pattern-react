@@ -1,4 +1,4 @@
-# 🚀 **Result Pattern - A safer approach for function returns in TypeScript**
+# 🚀 **Result Pattern - A safe and elegant pattern for handling errors in TypeScript**
 
 ## 📌 **Why use the Result Pattern?**
 
