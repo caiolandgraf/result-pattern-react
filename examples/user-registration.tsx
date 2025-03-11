@@ -34,12 +34,12 @@ export default function UserRegistration() {
 		setErrors([]);
 		setSuccess(false);
 
-		// Validação usando o Result pattern
+		// Validation using Result pattern
 		const name = PersonName.try(formData.name);
 		const email = Email.try(formData.email);
 		const password = StrongPassword.try(formData.password);
 
-		// Combinando os resultados
+		// Combining results
 		const result = ResultUtils.combine(name, email, password);
 
 		if (result.isFail) {
@@ -52,35 +52,33 @@ export default function UserRegistration() {
 			return;
 		}
 
-		// Se chegou aqui, todos os dados são válidos
+		// If we got here, all data is valid
 		setSuccess(true);
 		const [validName, validEmail, validPassword] = result.value;
-		console.log("Dados válidos:", {
+		console.log("Valid data:", {
 			name: validName.toString(),
 			email: validEmail.toString(),
-			password: "********", // Não exibimos a senha por segurança
+			password: "********", // We don't display the password for security
 		});
 
-		// Aqui você poderia enviar os dados para o servidor
+		// Here you could send the data to the server
 	};
 
 	return (
 		<div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-			<h1 className="text-2xl font-bold mb-6 text-center">
-				Cadastro de Usuário
-			</h1>
+			<h1 className="text-2xl font-bold mb-6 text-center">User Registration</h1>
 
 			{success && (
 				<div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
-					Cadastro realizado com sucesso!
+					Registration completed successfully!
 				</div>
 			)}
 
 			{errors.length > 0 && (
 				<div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
 					<ul className="list-disc pl-5">
-						{errors.map((error, index) => (
-							<li key={index}>{error}</li>
+						{errors.map((error) => (
+							<li key={`error-${error}`}>{error}</li>
 						))}
 					</ul>
 				</div>
@@ -92,7 +90,7 @@ export default function UserRegistration() {
 						htmlFor="name"
 						className="block text-sm font-medium text-gray-700 mb-1"
 					>
-						Nome
+						Name
 					</label>
 					<input
 						type="text"
@@ -126,7 +124,7 @@ export default function UserRegistration() {
 						htmlFor="password"
 						className="block text-sm font-medium text-gray-700 mb-1"
 					>
-						Senha
+						Password
 					</label>
 					<input
 						type="password"
@@ -142,7 +140,7 @@ export default function UserRegistration() {
 					type="submit"
 					className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
 				>
-					Cadastrar
+					Register
 				</button>
 			</form>
 		</div>

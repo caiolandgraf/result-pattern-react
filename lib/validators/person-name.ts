@@ -5,21 +5,21 @@ export class PersonName {
 
 	static try(value: string): Result<PersonName, string> {
 		if (!value) {
-			return new Fail("Nome é obrigatório");
+			return new Fail("Name is required");
 		}
 
 		if (value.length < 3) {
-			return new Fail("O nome deve ter pelo menos 3 caracteres");
+			return new Fail("Name must have at least 3 characters");
 		}
 
 		if (value.length > 100) {
-			return new Fail("O nome deve ter no máximo 100 caracteres");
+			return new Fail("Name must have at most 100 characters");
 		}
 
 		// Verifica se contém apenas letras, espaços e alguns caracteres especiais comuns em nomes
 		const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/;
 		if (!nameRegex.test(value)) {
-			return new Fail("O nome contém caracteres inválidos");
+			return new Fail("Name contains invalid characters");
 		}
 
 		return new Ok(new PersonName(value));

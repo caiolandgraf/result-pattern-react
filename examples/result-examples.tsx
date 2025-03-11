@@ -3,44 +3,40 @@ import { Email } from "../lib/validators/email";
 import { StrongPassword } from "../lib/validators/strong-password";
 
 export function ExampleUsage() {
-	// Exemplo 1: Criação básica de resultados
+	// Example 1: Basic creation of results
 	const okResult = new Ok<number, string>(42);
-	const failResult = new Fail<number, string>("Algo deu errado");
+	const failResult = new Fail<number, string>("Something went wrong");
 
-	console.log(
-		"Ok result:",
-		okResult.isOk ? "Sucesso" : "Falha",
-		okResult.value,
-	);
+	console.log("Ok result:", okResult.isOk ? "Success" : "Fail", okResult.value);
 	console.log(
 		"Fail result:",
-		failResult.isFail ? "Falha" : "Sucesso",
+		failResult.isFail ? "Fail" : "Success",
 		failResult.value,
 	);
 
-	// Exemplo 2: Validação de senha
+	// Example 2: Password validation
 	const password = StrongPassword.try("123");
-	console.log("Senha válida?", password.isOk);
+	console.log("Is valid password?", password.isOk);
 	if (password.isFail) {
-		console.log("Erros:", password.value);
+		console.log("Errors:", password.value);
 	}
 
-	// Exemplo 3: Combinando resultados
+	// Example 3: Combining results
 	const results = [
 		new Ok<number, string>(10),
 		new Fail<number, string>("user.not-found"),
 	];
 	const result2 = ResultUtils.combine(...results);
-	console.log("Combinação:", result2.isOk ? "Sucesso" : "Falha");
+	console.log("Combination:", result2.isOk ? "Success" : "Fail");
 
-	// Exemplo 4: Usando map para transformar valores
+	// Example 4: Using map to transform values
 	const nameResult = new Ok<string, string>("john doe");
 	const uppercaseName = nameResult.map((name) => name.toUpperCase());
-	console.log("Nome em maiúsculas:", uppercaseName.value);
+	console.log("Name in uppercase:", uppercaseName.value);
 
-	// Exemplo 5: Usando flatMap para encadear operações
+	// Example 5: Using flatMap to chain operations
 	const validateAndFormat = (name: string): Result<string, string> => {
-		if (name.length < 3) return new Fail("Nome muito curto");
+		if (name.length < 3) return new Fail("Name is too short");
 		return new Ok(name.trim());
 	};
 
@@ -48,34 +44,34 @@ export function ExampleUsage() {
 		.flatMap(validateAndFormat)
 		.map((name) => name.toUpperCase());
 
-	console.log("Nome processado:", nameProcessing.value);
+	console.log("Processed name:", nameProcessing.value);
 
-	// Exemplo 6: Validação de email e senha
-	const email = Email.try("usuario@exemplo.com");
-	const password2 = StrongPassword.try("Senha@123");
+	// Example 6: Email and password validation
+	const email = Email.try("johndoe@example.com");
+	const password2 = StrongPassword.try("Password@123");
 
-	// Combinando validações
+	// Combining validations
 	const combined = ResultUtils.combine(email, password2);
 	if (combined.isOk) {
 		const [validEmail, validPassword] = combined.value;
 		console.log(
-			"Dados válidos:",
+			"Invalid data:",
 			validEmail.toString(),
 			validPassword.toString(),
 		);
 	}
 
-	// Exemplo 7: Usando mapFails para transformar erros
-	const errorResult = new Fail<number, string>("erro.simples");
-	const detailedError = errorResult.mapFails((err) => `Erro detalhado: ${err}`);
-	console.log("Erro transformado:", detailedError.value);
+	// Example 7: Using mapFail to transform errors
+	const errorResult = new Fail<number, string>("error.simple");
+	const detailedError = errorResult.mapFails((err) => `Detailed error: ${err}`);
+	console.log("Transformed error:", detailedError.value);
 
-	// Exemplo 8: Usando flip para inverter Ok/Fail
-	const flippedOk = okResult.flip(); // Agora é um Fail
-	const flippedFail = failResult.flip(); // Agora é um Ok
+	// Example 8: Using flip to invert Ok/Fail
+	const flippedOk = okResult.flip(); // Now is Fail
+	const flippedFail = failResult.flip(); // Now is Ok
 	console.log(
 		"Flipped results:",
-		flippedOk.isFail ? "Ok virou Fail" : "Erro",
-		flippedFail.isOk ? "Fail virou Ok" : "Erro",
+		flippedOk.isFail ? "Ok became Fail" : "Error",
+		flippedFail.isOk ? "Fail became Ok" : "Error",
 	);
 }

@@ -5,11 +5,11 @@ export class StrongPassword {
 
 	static try(value: string): Result<StrongPassword, string[]> {
 		if (!value) {
-			return new Fail(["Senha é obrigatória"]);
+			return new Fail(["Password is required"]);
 		}
 
 		if (value.length < 8) {
-			return new Fail(["A senha deve ter pelo menos 8 caracteres"]);
+			return new Fail(["Password must have at least 8 characters"]);
 		}
 
 		const hasUpperCase = /[A-Z]/.test(value);
@@ -19,12 +19,12 @@ export class StrongPassword {
 
 		const errors: string[] = [];
 		if (!hasUpperCase)
-			errors.push("A senha deve conter pelo menos uma letra maiúscula");
+			errors.push("Password must contain at least one uppercase letter");
 		if (!hasLowerCase)
-			errors.push("A senha deve conter pelo menos uma letra minúscula");
-		if (!hasNumbers) errors.push("A senha deve conter pelo menos um número");
+			errors.push("Password must contain at least one lowercase letter");
+		if (!hasNumbers) errors.push("Password must contain at least one number");
 		if (!hasSpecialChar)
-			errors.push("A senha deve conter pelo menos um caractere especial");
+			errors.push("Password must contain at least one special character");
 
 		if (errors.length > 0) {
 			return new Fail(errors);
