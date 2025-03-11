@@ -1,23 +1,22 @@
-import Result from "../result"
+import { Fail, Ok, type Result } from "../result";
 
 export class Email {
-  private constructor(public readonly value: string) {}
+	private constructor(public readonly value: string) {}
 
-  static try(value: string): Result<Email> {
-    if (!value) {
-      return Result.fail("Email é obrigatório")
-    }
+	static try(value: string): Result<Email, string> {
+		if (!value) {
+			return new Fail("Email é obrigatório");
+		}
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(value)) {
-      return Result.fail("Email inválido")
-    }
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(value)) {
+			return new Fail("Email inválido");
+		}
 
-    return Result.ok(new Email(value))
-  }
+		return new Ok(new Email(value));
+	}
 
-  toString(): string {
-    return this.value
-  }
+	toString(): string {
+		return this.value;
+	}
 }
-

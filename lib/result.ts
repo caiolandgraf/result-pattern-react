@@ -1,106 +1,90 @@
-type ErrorMsg = string | Message | { message: string } | ErrorMsg[]
+export type Result<V, E> = Ok<V, E> | Fail<V, E>;
 
-interface Message {
-  code?: string
-  message?: string
-  error?: any
+interface IResult<V, E> {
+	readonly isOk: boolean;
+	readonly isFail: boolean;
+	readonly value: V | E;
+
+	map<NextV>(mapFn: (value: V) => NextV): Result<NextV, E>;
+
+	flatMap<NextV>(mapFn: (value: V) => Result<NextV, E>): Result<NextV, E>;
+
+	mapFails<NextE>(mapFn: (value: E) => NextE): Result<V, NextE>;
+
+	flip(): Result<E, V>;
 }
 
-export default class Result<T> {
-  constructor(
-    readonly data?: T | null,
-    readonly errors: Message[] = [],
-  ) {}
+export class Ok<V, E> implements IResult<V, E> {
+	public readonly isOk = true as const;
+	public readonly isFail = false as const;
 
-  static ok<T>(data?: T): Result<T> {
-    return new Result<T>(data ?? null)
-  }
+	public constructor(public readonly value: V) {}
 
-  static null(): Result<null> {
-    return Result.ok()
-  }
+	public map<NextV>(mapFn: (value: V) => NextV): Result<NextV, E> {
+		return new Ok(mapFn(this.value));
+	}
 
-  static fail<T>(data: ErrorMsg | ErrorMsg[]): Result<T> {
-    return new Result<T>(undefined, Result.getErrors(data))
-  }
+	public flatMap<NextV>(
+		mapFn: (value: V) => Result<NextV, E>,
+	): Result<NextV, E> {
+		return mapFn(this.value);
+	}
 
-  static try<T>(fn: () => T): Result<T> {
-    try {
-      return Result.ok<T>(fn())
-    } catch (e: any) {
-      return Result.fail<T>(e)
-    }
-  }
+	public mapFails<NextE>(mapFn: (value: E) => NextE): Result<V, NextE> {
+		return new Ok(this.value);
+	}
 
-  static async trySync<T>(fn: () => Promise<T>): Promise<Result<T>> {
-    try {
-      return Result.ok<T>(await fn())
-    } catch (e: any) {
-      return Result.fail<T>(e)
-    }
-  }
-
-  static combine<T>(results: (Result<T> | null)[]): Result<T[]> {
-    const validResults: Result<T>[] = results.filter((result): result is Result<T> => result !== null)
-
-    if (validResults.length === 0) {
-      return Result.ok<T[]>([])
-    }
-
-    const errors: Message[] = []
-    const data: T[] = []
-
-    for (const result of validResults) {
-      if (result.isSuccess() && result.data !== null) {
-        data.push(result.data)
-      }
-
-      if (result.isFailure()) {
-        errors.push(...result.errors)
-      }
-    }
-
-    if (errors.length > 0) {
-      return new Result<T[]>(undefined, errors)
-    }
-
-    return Result.ok<T[]>(data)
-  }
-
-  static getErrors(data: ErrorMsg | ErrorMsg[]): Message[] {
-    if (Array.isArray(data)) {
-      return data.flatMap((item) => Result.getErrors(item))
-    }
-
-    if (typeof data === "string") {
-      return [{ message: data }]
-    }
-
-    if (data && typeof data === "object" && "message" in data) {
-      return [{ message: data.message }]
-    }
-
-    return [data as Message]
-  }
-
-  isSuccess(): boolean {
-    return this.errors.length === 0
-  }
-
-  isFailure(): boolean {
-    return !this.isSuccess()
-  }
-
-  throwErrorIfFailed(): T | null {
-    if (this.isFailure()) {
-      throw new Error(this.errors.map((error) => error.message || error.code || JSON.stringify(error)).join(", "))
-    }
-
-    return this.data
-  }
-
-  getErrorMessage(): string {
-    return this.errors.map((error) => error.message || error.code || JSON.stringify(error)).join(", ")
-  }
+	public flip(): Result<E, V> {
+		return new Fail(this.value);
+	}
 }
 
+export class Fail<V, E> implements IResult<V, E> {
+	public readonly isOk = false as const;
+	public readonly isFail = true as const;
+
+	public constructor(public readonly value: E) {}
+
+	public map<NextV>(mapFn: (value: V) => NextV): Result<NextV, E> {
+		return new Fail(this.value);
+	}
+
+	public flatMap<NextV>(
+		mapFn: (value: V) => Result<NextV, E>,
+	): Result<NextV, E> {
+		return new Fail(this.value);
+	}
+
+	public mapFails<NextE>(mapFn: (value: E) => NextE): Result<V, NextE> {
+		return new Fail(mapFn(this.value));
+	}
+
+	public flip(): Result<E, V> {
+		return new Ok(this.value);
+	}
+}
+
+export namespace ResultUtils {
+	type OkValues<T extends Result<any, any>[]> = {
+		[K in keyof T]: T[K] extends Result<infer V, any> ? V : never;
+	};
+	type FailValues<T extends Result<any, any>[]> = Array<
+		T[number] extends Result<any, infer E> ? E : never
+	>;
+
+	export function combine<T extends Result<any, any>[]>(
+		...results: T
+	): Result<OkValues<T>, FailValues<T>> {
+		const fails = results.filter(
+			(r): r is Fail<any, FailValues<T>[number]> => r.isFail,
+		);
+
+		if (fails.length > 0) {
+			const failValues: FailValues<T> = fails.map((f) => f.value);
+			return new Fail(failValues);
+		}
+
+		const okValues: OkValues<T> = results.map((r) => r.value) as OkValues<T>;
+		return new Ok(okValues);
+	}
+}
