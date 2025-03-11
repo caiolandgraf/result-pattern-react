@@ -1,10 +1,10 @@
-# 🚀 **Pattern Result - Uma abordagem mais segura para retorno de funções em TypeScript**  
+# 🚀 **Result Pattern - Uma abordagem mais segura para retorno de funções em TypeScript**  
 
-## 📌 **Por que usar o Pattern Result?**  
+## 📌 **Por que usar o Result Pattern?**  
 
 Quando escrevemos código em TypeScript, o tratamento de erros pode ser um problema. Diferente de linguagens como Java e C#, TypeScript **não oferece uma forma de saber quais erros uma função pode lançar**, o que torna o rastreamento e a depuração mais difíceis.  
 
-O **Pattern Result** resolve esse problema ao fornecer um **padrão estruturado para retornos**, garantindo que todas as operações tenham um resultado previsível:  
+O **Result Pattern** resolve esse problema ao fornecer um **padrão estruturado para retornos**, garantindo que todas as operações tenham um resultado previsível:  
 
 ✅ **Fácil rastreamento de erros**  
 ✅ **Código mais limpo e organizado (sem `try/catch` em todo lugar)**  
@@ -15,7 +15,7 @@ O **Pattern Result** resolve esse problema ao fornecer um **padrão estruturado 
 
 ## 🛠️ **Como funciona?**  
 
-O **Pattern Result** encapsula um **valor de sucesso** ou uma **lista de erros**, garantindo que o código sempre tenha um retorno consistente.  
+O **Result Pattern** encapsula um **valor de sucesso** ou uma **lista de erros**, garantindo que o código sempre tenha um retorno consistente.  
 
 ```ts
 const sucesso = Result.ok("Tudo certo!") // Result<string>
@@ -35,7 +35,7 @@ Agora, em vez de lidar com exceções espalhadas pelo código, podemos **tratar 
 
 Imagine que temos uma função que pode falhar ao carregar um usuário.  
 
-### ❌ Sem Pattern Result (método tradicional)  
+### ❌ Sem Result Pattern (método tradicional)  
 ```ts
 function getUser(id: number): User {
   if (id <= 0) throw new Error("ID inválido!")
@@ -53,7 +53,7 @@ Problema: ❌ **Não sabemos quais erros podem ser lançados sem olhar o código
 
 ---
 
-### ✅ Com Pattern Result (abordagem estruturada)  
+### ✅ Com Result Pattern (abordagem estruturada)  
 ```ts
 function getUser(id: number): Result<User> {
   if (id <= 0) return Result.fail("ID inválido!")
@@ -74,7 +74,7 @@ if (result.isFailure()) {
 
 ## 📦 **Agrupamento de múltiplos erros**  
 
-Se você precisar **coletar vários erros de diferentes partes do sistema** antes de retornar um erro final, o **Pattern Result** torna isso super fácil.  
+Se você precisar **coletar vários erros de diferentes partes do sistema** antes de retornar um erro final, o **Result Pattern** torna isso super fácil.  
 
 ```ts
 const r1 = Result.fail("Erro no banco de dados!")
@@ -94,7 +94,7 @@ Isso melhora a **experiência do usuário** porque ele recebe **todos os erros d
 
 ## ✨ **Código mais limpo e sem aninhamento desnecessário**  
 
-Sem **Pattern Result**, um código assíncrono pode virar um **monstro de `try/catch`**:  
+Sem **Result Pattern**, um código assíncrono pode virar um **monstro de `try/catch`**:  
 ```ts
 try {
   const user = await getUser()
@@ -118,7 +118,7 @@ try {
 
 ---
 
-### ✅ **Com Pattern Result: Zero aninhamento, muito mais legível**  
+### ✅ **Com Result Pattern: Zero aninhamento, muito mais legível**  
 ```ts
 const user = await Result.trySync(() => getUser())
 if (user.isFailure()) return console.error(user.getErrorMessage())
@@ -137,14 +137,14 @@ console.log(invoice.data)
 
 ## 🎯 **Conclusão**  
 
-O **Pattern Result** **deveria ser obrigatório** em projetos TypeScript porque:  
+O **Result Pattern** **deveria ser obrigatório** em projetos TypeScript porque:  
 
 ✅ **Facilita o rastreamento de erros**  
 ✅ **Elimina aninhamentos desnecessários**  
 ✅ **Permite agrupar erros e fornecer feedback melhor ao usuário**  
 ✅ **Evita exceções inesperadas, tornando o código previsível e confiável**  
 
-Se você quer um código mais **limpo, escalável e fácil de depurar**, **o Pattern Result é a solução!** 🚀
+Se você quer um código mais **limpo, escalável e fácil de depurar**, **o Result Pattern é a solução!** 🚀
 
 ---
 
