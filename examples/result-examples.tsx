@@ -79,14 +79,3 @@ export function ExampleUsage() {
 		flippedFail.isOk ? "Fail virou Ok" : "Erro",
 	);
 }
-
-// Dummy PersonName validator for demonstration purposes
-class PersonName {
-	static try(name: string): Result<string, string> {
-		if (name && name.length > 0) {
-			return new Ok(name);
-		} else {
-			return new Fail("person.name-invalid");
-		}
-	}
-}
