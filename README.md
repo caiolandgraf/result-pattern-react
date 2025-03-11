@@ -18,13 +18,13 @@ O **Result Pattern** resolve esse problema ao fornecer um **padrão estruturado 
 O **Result Pattern** encapsula um **valor de sucesso** ou uma **lista de erros**, garantindo que o código sempre tenha um retorno consistente.  
 
 ```ts
-const sucesso = Result.ok("Tudo certo!") // Result<string>
-console.log(sucesso.isSuccess()) // true
-console.log(sucesso.data) // "Tudo certo!"
+const sucesso = new Ok("Tudo certo!") // Result<string>
+console.log(sucesso.isOk) // true
+console.log(sucesso.value) // "Tudo certo!"
 
-const erro = Result.fail("Ocorreu um erro!")
-console.log(erro.isFailure()) // true
-console.log(erro.getErrorMessage()) // "Ocorreu um erro!"
+const erro = new Fail("Ocorreu um erro!")
+console.log(erro.isFail) // true
+console.log(erro.value) // "Ocorreu um erro!"
 ```
 
 Agora, em vez de lidar com exceções espalhadas pelo código, podemos **tratar os erros de forma estruturada e previsível**.
@@ -55,20 +55,20 @@ Problema: ❌ **Não sabemos quais erros podem ser lançados sem olhar o código
 
 ### ✅ Com Result Pattern (abordagem estruturada)  
 ```ts
-function getUser(id: number): Result<User> {
-  if (id <= 0) return Result.fail("ID inválido!")
-  return Result.ok({ id, name: "Caio" })
+function getUser(id: number): Result<User, string> {
+  if (id <= 0) return new Fail("ID inválido!")
+  return new Ok({ id, name: "Caio" })
 }
 
 const result = getUser(-1)
 
-if (result.isFailure()) {
-  console.error("Erro:", result.getErrorMessage()) // "Erro: ID inválido!"
+if (result.isFail) {
+  console.error("Erro:", result.value) // "Erro: ID inválido!"
 } else {
-  console.log(result.data)
+  console.log(result.value)
 }
 ```
-✅ **Fácil rastreamento de erro** – Qualquer função que retorne `Result<T>` **não lança exceções**, tornando o fluxo de erro mais previsível.  
+✅ **Fácil rastreamento de erro** – Qualquer função que retorne `Result<T, E>` **não lança exceções**, tornando o fluxo de erro mais previsível.  
 
 ---
 
@@ -77,15 +77,15 @@ if (result.isFailure()) {
 Se você precisar **coletar vários erros de diferentes partes do sistema** antes de retornar um erro final, o **Result Pattern** torna isso super fácil.  
 
 ```ts
-const r1 = Result.fail("Erro no banco de dados!")
-const r2 = Result.fail("Falha ao autenticar usuário!")
-const r3 = Result.ok(42)
+const r1 = new Fail("Erro no banco de dados!")
+const r2 = new Fail("Falha ao autenticar usuário!")
+const r3 = new Ok(42)
 
-const combinado = Result.combine([r1, r2, r3])
+const combinado = ResultUtils.combine([r1, r2, r3])
 
-console.log(combinado.isFailure()) // true
-console.log(combinado.getErrorMessage()) 
-// "Erro no banco de dados!, Falha ao autenticar usuário!"
+console.log(combinado.isFail) // true
+console.log(combinado.value) 
+// ["Erro no banco de dados!", "Falha ao autenticar usuário!"]
 ```
 
 Isso melhora a **experiência do usuário** porque ele recebe **todos os erros de uma só vez**, em vez de corrigir um erro e só depois descobrir que existem mais problemas.
@@ -121,15 +121,15 @@ try {
 ### ✅ **Com Result Pattern: Zero aninhamento, muito mais legível**  
 ```ts
 const user = await Result.trySync(() => getUser())
-if (user.isFailure()) return console.error(user.getErrorMessage())
+if (user.isFail) return console.error(user.value)
 
-const orders = await Result.trySync(() => getOrders(user.data!.id))
-if (orders.isFailure()) return console.error(orders.getErrorMessage())
+const orders = await Result.trySync(() => getOrders(user.value.id))
+if (orders.isFail) return console.error(orders.value)
 
-const invoice = await Result.trySync(() => generateInvoice(orders.data!))
-if (invoice.isFailure()) return console.error(invoice.getErrorMessage())
+const invoice = await Result.trySync(() => generateInvoice(orders.value))
+if (invoice.isFail) return console.error(invoice.value)
 
-console.log(invoice.data)
+console.log(invoice.value)
 ```
 ✨ **Muito mais limpo, fácil de entender e sem aninhamento desnecessário!**  
 
