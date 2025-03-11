@@ -14,7 +14,7 @@ interface IResult<V, E> {
 	flip(): Result<E, V>;
 }
 
-export class Ok<V, E> implements IResult<V, E> {
+export class Ok<V = never, E = never> implements IResult<V, E> {
 	public readonly isOk = true as const;
 	public readonly isFail = false as const;
 
@@ -39,7 +39,7 @@ export class Ok<V, E> implements IResult<V, E> {
 	}
 }
 
-export class Fail<V, E> implements IResult<V, E> {
+export class Fail<V = never, E = never> implements IResult<V, E> {
 	public readonly isOk = false as const;
 	public readonly isFail = true as const;
 
@@ -65,26 +65,23 @@ export class Fail<V, E> implements IResult<V, E> {
 }
 
 export namespace ResultUtils {
-	type OkValues<T extends Result<any, any>[]> = {
-		[K in keyof T]: T[K] extends Result<infer V, any> ? V : never;
+	type OkValues<T extends readonly Result<unknown, unknown>[]> = {
+		[K in keyof T]: T[K] extends Result<infer V, unknown> ? V : never;
 	};
-	type FailValues<T extends Result<any, any>[]> = Array<
-		T[number] extends Result<any, infer E> ? E : never
-	>;
+	type FailValues<T extends readonly Result<unknown, unknown>[]> =
+		T extends readonly Result<unknown, infer E>[] ? E[] : never;
 
-	export function combine<T extends Result<any, any>[]>(
+	export function combine<T extends readonly Result<unknown, unknown>[]>(
 		...results: T
 	): Result<OkValues<T>, FailValues<T>> {
-		const fails = results.filter(
-			(r): r is Fail<any, FailValues<T>[number]> => r.isFail,
-		);
+		const fails = results.filter((r): r is Fail<unknown, unknown> => r.isFail);
 
 		if (fails.length > 0) {
-			const failValues: FailValues<T> = fails.map((f) => f.value);
+			const failValues = fails.map((f) => f.value) as FailValues<T>;
 			return new Fail(failValues);
 		}
 
-		const okValues: OkValues<T> = results.map((r) => r.value) as OkValues<T>;
+		const okValues = results.map((r) => r.value) as OkValues<T>;
 		return new Ok(okValues);
 	}
 }
