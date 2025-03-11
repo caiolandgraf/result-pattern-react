@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
 	title: "Result Pattern",
-	description: "A pattern for handling errors in TypeScript",
+	description: "A safer approach for function returns in TypeScript",
 	generator: "@caiolandgraf",
 };
 
