@@ -1,151 +1,164 @@
-# 🚀 **Result Pattern - Uma abordagem mais segura para retorno de funções em TypeScript**  
+# 🚀 **Result Pattern - A safer approach for function returns in TypeScript**
 
-## 📌 **Por que usar o Result Pattern?**  
+## 📌 **Why use the Result Pattern?**
 
-Quando escrevemos código em TypeScript, o tratamento de erros pode ser um problema. Diferente de linguagens como Java e C#, TypeScript **não oferece uma forma de saber quais erros uma função pode lançar**, o que torna o rastreamento e a depuração mais difíceis.  
+When writing code in TypeScript, error handling can be problematic. Unlike languages like Java and C#, TypeScript **doesn't provide a way to know which errors a function might throw**, making tracking and debugging more difficult.
 
-O **Result Pattern** resolve esse problema ao fornecer um **padrão estruturado para retornos**, garantindo que todas as operações tenham um resultado previsível:  
+The **Result Pattern** solves this problem by providing a **structured pattern for returns**, ensuring that all operations have a predictable result:
 
-✅ **Fácil rastreamento de erros**  
-✅ **Código mais limpo e organizado (sem `try/catch` em todo lugar)**  
-✅ **Agrupamento de múltiplos erros, melhorando a experiência do usuário**  
-✅ **Eliminação do aninhamento excessivo (`if/else`, `try/catch` dentro de `try/catch`)**  
+✅ **Easy error tracking**  
+✅ **Cleaner, more organized code (without `try/catch` everywhere)**  
+✅ **Multiple error grouping, improving user experience**  
+✅ **Elimination of excessive nesting (`if/else`, `try/catch` inside `try/catch`)**
 
 ---
 
-## 🛠️ **Como funciona?**  
+## 🛠️ **How does it work?**
 
-O **Result Pattern** encapsula um **valor de sucesso** ou uma **lista de erros**, garantindo que o código sempre tenha um retorno consistente.  
+The **Result Pattern** encapsulates a **success value** or a **list of errors**, ensuring that code always has a consistent return.
 
 ```ts
-const sucesso = new Ok("Tudo certo!") // Result<string>
-console.log(sucesso.isOk) // true
-console.log(sucesso.value) // "Tudo certo!"
+const success = new Ok("All good!"); // Result<string>
+console.log(success.isOk); // true
+console.log(success.value); // "All good!"
 
-const erro = new Fail("Ocorreu um erro!")
-console.log(erro.isFail) // true
-console.log(erro.value) // "Ocorreu um erro!"
+const error = new Fail("An error occurred!");
+console.log(error.isFail); // true
+console.log(error.value); // "An error occurred!"
 ```
 
-Agora, em vez de lidar com exceções espalhadas pelo código, podemos **tratar os erros de forma estruturada e previsível**.
+Now, instead of dealing with exceptions scattered throughout the code, we can **handle errors in a structured and predictable way**.
 
 ---
 
-## 🔥 **Rastreamento de erros simplificado**  
+## 🔥 **Simplified error tracking**
 
-Imagine que temos uma função que pode falhar ao carregar um usuário.  
+Imagine we have a function that might fail when loading a user.
 
-### ❌ Sem Result Pattern (método tradicional)  
+### ❌ Without Result Pattern (traditional method)
+
 ```ts
 function getUser(id: number): User {
-  if (id <= 0) throw new Error("ID inválido!")
-  return { id, name: "Caio" }
+  if (id <= 0) throw new Error("Invalid ID!");
+  return { id, name: "Caio" };
 }
 
 try {
-  const user = getUser(-1)
-  console.log(user)
+  const user = getUser(-1);
+  console.log(user);
 } catch (e) {
-  console.error("Erro:", e.message)
+  console.error("Error:", e.message);
 }
 ```
-Problema: ❌ **Não sabemos quais erros podem ser lançados sem olhar o código**.  
+
+Problem: ❌ **We don't know which errors might be thrown without looking at the code**.
 
 ---
 
-### ✅ Com Result Pattern (abordagem estruturada)  
+### ✅ With Result Pattern (structured approach)
+
 ```ts
 function getUser(id: number): Result<User, string> {
-  if (id <= 0) return new Fail("ID inválido!")
-  return new Ok({ id, name: "Caio" })
+  if (id <= 0) return new Fail("Invalid ID!");
+  return new Ok({ id, name: "Caio" });
 }
 
-const result = getUser(-1)
+const result = getUser(-1);
 
 if (result.isFail) {
-  console.error("Erro:", result.value) // "Erro: ID inválido!"
+  console.error("Error:", result.value); // "Error: Invalid ID!"
 } else {
-  console.log(result.value)
+  console.log(result.value);
 }
 ```
-✅ **Fácil rastreamento de erro** – Qualquer função que retorne `Result<T, E>` **não lança exceções**, tornando o fluxo de erro mais previsível.  
+
+✅ **Easy error tracking** – Any function that returns `Result<T, E>` **doesn't throw exceptions**, making the error flow more predictable.
 
 ---
 
-## 📦 **Agrupamento de múltiplos erros**  
+## 📦 **Multiple error grouping**
 
-Se você precisar **coletar vários erros de diferentes partes do sistema** antes de retornar um erro final, o **Result Pattern** torna isso super fácil.  
+If you need to **collect several errors from different parts of the system** before returning a final error, the **Result Pattern** makes this super easy.
 
 ```ts
-const r1 = new Fail("Erro no banco de dados!")
-const r2 = new Fail("Falha ao autenticar usuário!")
-const r3 = new Ok(42)
+const r1 = new Fail("Database error!");
+const r2 = new Fail("User authentication failure!");
+const r3 = new Ok(42);
 
-const combinado = ResultUtils.combine([r1, r2, r3])
+const combined = ResultUtils.combine([r1, r2, r3]);
 
-console.log(combinado.isFail) // true
-console.log(combinado.value) 
-// ["Erro no banco de dados!", "Falha ao autenticar usuário!"]
+console.log(combined.isFail); // true
+console.log(combined.value);
+// ["Database error!", "User authentication failure!"]
 ```
 
-Isso melhora a **experiência do usuário** porque ele recebe **todos os erros de uma só vez**, em vez de corrigir um erro e só depois descobrir que existem mais problemas.
+This improves the **user experience** because they receive **all errors at once**, instead of fixing one error only to discover later that more problems exist.
 
 ---
 
-## ✨ **Código mais limpo e sem aninhamento desnecessário**  
+## ✨ **Cleaner code without unnecessary nesting**
 
-Sem **Result Pattern**, um código assíncrono pode virar um **monstro de `try/catch`**:  
+Without **Result Pattern**, asynchronous code can turn into a **`try/catch` monster**:
+
 ```ts
 try {
-  const user = await getUser()
+  const user = await getUser();
   try {
-    const orders = await getOrders(user.id)
+    const orders = await getOrders(user.id);
     try {
-      const invoice = await generateInvoice(orders)
-      console.log(invoice)
+      const invoice = await generateInvoice(orders);
+      console.log(invoice);
     } catch (e) {
-      console.error("Erro ao gerar fatura:", e.message)
+      console.error("Error generating invoice:", e.message);
     }
   } catch (e) {
-    console.error("Erro ao buscar pedidos:", e.message)
+    console.error("Error fetching orders:", e.message);
   }
 } catch (e) {
-  console.error("Erro ao buscar usuário:", e.message)
+  console.error("Error fetching user:", e.message);
 }
 ```
 
-🛑 **Isso é horrível para manutenção!**  
+🛑 **This is horrible for maintenance!**
 
 ---
 
-### ✅ **Com Result Pattern: Zero aninhamento, muito mais legível**  
+### ✅ **With Result Pattern: Zero nesting, much more readable**
+
 ```ts
-const user = await Result.trySync(() => getUser())
-if (user.isFail) return console.error(user.value)
+const user = await Result.trySync(() => getUser());
+if (user.isFail) return console.error(user.value);
 
-const orders = await Result.trySync(() => getOrders(user.value.id))
-if (orders.isFail) return console.error(orders.value)
+const orders = await Result.trySync(() => getOrders(user.value.id));
+if (orders.isFail) return console.error(orders.value);
 
-const invoice = await Result.trySync(() => generateInvoice(orders.value))
-if (invoice.isFail) return console.error(invoice.value)
+const invoice = await Result.trySync(() => generateInvoice(orders.value));
+if (invoice.isFail) return console.error(invoice.value);
 
-console.log(invoice.value)
+console.log(invoice.value);
 ```
-✨ **Muito mais limpo, fácil de entender e sem aninhamento desnecessário!**  
+
+✨ **Much cleaner, easier to understand, and without unnecessary nesting!**
 
 ---
 
-## 🎯 **Conclusão**  
+## 🎯 **Conclusion**
 
-O **Result Pattern** **deveria ser obrigatório** em projetos TypeScript porque:  
+The **Result Pattern** **should be mandatory** in TypeScript projects because:
 
-✅ **Facilita o rastreamento de erros**  
-✅ **Elimina aninhamentos desnecessários**  
-✅ **Permite agrupar erros e fornecer feedback melhor ao usuário**  
-✅ **Evita exceções inesperadas, tornando o código previsível e confiável**  
+✅ **Makes error tracking easier**  
+✅ **Eliminates unnecessary nesting**  
+✅ **Allows grouping errors and providing better feedback to the user**  
+✅ **Avoids unexpected exceptions, making the code predictable and reliable**
 
-Se você quer um código mais **limpo, escalável e fácil de depurar**, **o Result Pattern é a solução!** 🚀
+If you want **cleaner, more scalable, and easier-to-debug code**, **the Result Pattern is the solution!** 🚀
 
 ---
 
-Com 💜 [@caiolandgraf](https://eicode.com.br)
+With 💜 [@caiolandgraf](https://eicode.com.br)
+
+## 👥 **Contributors**
+
+Special thanks to all the brilliant minds who have contributed to this project. Your expertise and dedication make this project better every day! 🌟
+
+- [@cristoferms](https://github.com/cristoferms)
