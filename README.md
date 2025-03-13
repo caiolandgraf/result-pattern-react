@@ -1,5 +1,13 @@
 # 🚀 **Result Pattern - A safe and elegant pattern for handling errors in TypeScript**
 
+---
+
+## 📦 **Looking for a package?**
+
+The package is available on [npm](https://www.npmjs.com/package/result-pattern).
+
+---
+
 ## 📌 **Why use the Result Pattern?**
 
 When writing code in TypeScript, error handling can be problematic. Unlike languages like Java and C#, TypeScript **doesn't provide a way to know which errors a function might throw**, making tracking and debugging more difficult.
@@ -152,8 +160,6 @@ The **Result Pattern** **should be mandatory** in TypeScript projects because:
 ✅ **Avoids unexpected exceptions, making the code predictable and reliable**
 
 If you want **cleaner, more scalable, and easier-to-debug code**, **the Result Pattern is the solution!** 🚀
-
----
 
 ## 👥 **Contributors**
 
